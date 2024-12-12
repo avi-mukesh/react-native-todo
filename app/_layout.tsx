@@ -1,39 +1,33 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import { colors } from "@/constants/colors";
+import { Stack } from "expo-router";
+import { Appearance } from "react-native";
 
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+// react-native also provides a SafeAreaView which we used in the other project (react-native-dave-gray)
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
+  const colorScheme = Appearance.getColorScheme();
+  const theme = colorScheme === "dark" ? colors.dark : colors.light;
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
+    <SafeAreaProvider>
+      <Stack
+        screenOptions={{
+          headerStyle: { backgroundColor: theme.headerBackground },
+          headerTintColor: theme.text,
+          headerShadowVisible: false,
+          headerTitleAlign: "center",
+        }}
+      >
+        <Stack.Screen
+          name="index"
+          options={{
+            headerShown: true,
+            title: "Todos",
+            headerTitle: "Your todos",
+          }}
+        />
       </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    </SafeAreaProvider>
   );
 }
