@@ -19,7 +19,7 @@ import { ThemeContext } from "@react-navigation/native";
 
 export default function Index() {
   const [newTodo, setNewTodo] = useState("");
-  const [todos, setTodos] = useState(data);
+  const [todos, setTodos] = useState(data.sort((a, b) => b.id - a.id));
   const Container = Platform.OS === "web" ? ScrollView : SafeAreaView;
   const colorScheme = Appearance.getColorScheme();
   const theme = colorScheme === "dark" ? colors.dark : colors.light;
@@ -29,56 +29,84 @@ export default function Index() {
     setTodos(todos.filter((todo) => todo.id !== id));
   };
 
+  const toggleTodo = (id: number) => {
+    setTodos(
+      todos.map((todo) =>
+        todo.id !== id ? todo : { ...todo, completed: !todo.completed }
+      )
+    );
+  };
+
+  const addTodo = () => {
+    if (newTodo.trim()) {
+      setTodos([
+        {
+          id: todos.length > 0 ? todos[0].id + 1 : 1,
+          title: newTodo.trim(),
+          completed: false,
+        },
+        ...todos,
+      ]);
+      setNewTodo("");
+    }
+  };
+
   return (
-    <View
-      style={{
-        flex: 1,
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Container style={styles.container}>
+    // <View
+    //   style={{
+    //     flex: 1,
+    //     flexDirection: "column",
+    //     justifyContent: "center",
+    //     alignItems: "center",
+    //   }}
+    // >
+    <Container style={styles.container}>
+      <View style={styles.inputContainer}>
         <TextInput
+          placeholder="Add todo..."
+          placeholderTextColor="#333"
           style={styles.textInput}
           value={newTodo}
           onChangeText={(val) => setNewTodo(val)}
-          onSubmitEditing={() =>
-            setTodos([
-              ...todos,
-              {
-                id: Math.ceil(10000 * Math.random()),
-                title: newTodo,
-                completed: false,
-              },
-            ])
-          }
+          onSubmitEditing={addTodo}
         />
-        <FlatList
-          data={todos}
-          keyExtractor={(todo) => todo.id.toString()}
-          renderItem={({ item }) => (
-            <Todo todo={item} deleteTodo={deleteTodo} />
-          )}
-        />
-      </Container>
-    </View>
+      </View>
+      <FlatList
+        data={todos}
+        keyExtractor={(todo) => todo.id.toString()}
+        renderItem={({ item }) => (
+          <Todo todo={item} deleteTodo={deleteTodo} toggleTodo={toggleTodo} />
+        )}
+        contentContainerStyle={{ flexGrow: 1 }}
+      />
+    </Container>
+    // </View>
   );
 }
 
 function createStyles(theme: Theme, colorScheme: ColorSchemeName) {
   return StyleSheet.create({
     container: {
+      flex: 1,
       flexDirection: "column",
-      width: "80%",
-      paddingVertical: 30,
+      justifyContent: "center",
+      alignItems: "center",
+      width: "100%",
+      marginVertical: 30,
+    },
+    inputContainer: {
+      width: "100%",
+      maxWidth: 1024,
+      minWidth: 0,
     },
     textInput: {
       borderWidth: 1,
       padding: 6,
-      minWidth: "50%",
-      height: 30,
-      marginVertical: 20,
+      height: 40,
+      marginBottom: 20,
+      borderRadius: 5,
+      fontSize: 18,
+      marginHorizontal: 10,
     },
   });
 }
