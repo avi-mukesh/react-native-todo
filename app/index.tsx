@@ -19,6 +19,7 @@ import Todo from "@/components/Todo";
 import { Inter_500Medium, useFonts } from "@expo-google-fonts/inter";
 import { useTheme } from "@/context/ThemeContext";
 import Octicons from "@expo/vector-icons/Octicons";
+import Animated, { LinearTransition } from "react-native-reanimated";
 
 export default function Index() {
   const [newTodo, setNewTodo] = useState("");
@@ -80,7 +81,7 @@ export default function Index() {
           />
         </Pressable>
       </View>
-      <FlatList
+      <Animated.FlatList
         data={todos}
         keyExtractor={(todo) => todo.id.toString()}
         renderItem={({ item }) => (
@@ -91,6 +92,8 @@ export default function Index() {
           justifyContent: "center",
           alignItems: "center",
         }}
+        itemLayoutAnimation={LinearTransition}
+        keyboardDismissMode="on-drag" // when we swipe up to scroll, it dismisses the keyboard
       />
     </Container>
   );
