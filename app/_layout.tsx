@@ -26,8 +26,8 @@ export default function RootLayout() {
           <Stack.Screen
             name="index"
             options={{
-              headerShown: true,
-              statusBarHidden: true,
+              headerShown: false,
+              // statusBarHidden: true,
               title: "Todos",
               headerTitle: "Your todos",
             }}

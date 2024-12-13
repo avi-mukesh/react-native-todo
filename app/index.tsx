@@ -21,6 +21,7 @@ import { useTheme } from "@/context/ThemeContext";
 import Octicons from "@expo/vector-icons/Octicons";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { StatusBar } from "expo-status-bar";
 
 type Todo = {
   id: number;
@@ -97,6 +98,7 @@ export default function Index() {
 
   return (
     <Container style={styles.container}>
+      <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
       <View style={styles.inputContainer}>
         <TextInput
           placeholder="Add todo..."
