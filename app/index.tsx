@@ -14,20 +14,57 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { data } from "@/data/todos";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Todo from "@/components/Todo";
 import { Inter_500Medium, useFonts } from "@expo-google-fonts/inter";
 import { useTheme } from "@/context/ThemeContext";
 import Octicons from "@expo/vector-icons/Octicons";
 import Animated, { LinearTransition } from "react-native-reanimated";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+type Todo = {
+  id: number;
+  title: string;
+  completed: boolean;
+};
 
 export default function Index() {
   const [newTodo, setNewTodo] = useState("");
-  const [todos, setTodos] = useState(data.sort((a, b) => b.id - a.id));
+  const [todos, setTodos] = useState<Todo[]>([]);
   const { colorScheme, setColorScheme, theme } = useTheme();
   const Container = Platform.OS === "web" ? ScrollView : SafeAreaView;
 
   const styles = createStyles(theme, colorScheme);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const json = await AsyncStorage.getItem("TodoApp");
+        const storageTodos = json !== null ? JSON.parse(json) : null;
+
+        if (storageTodos && storageTodos.length > 0) {
+          setTodos(storageTodos.sort((a: Todo, b: Todo) => b.id - a.id));
+        } else {
+          setTodos(data.sort((a, b) => b.id - a.id));
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const storeData = async () => {
+      try {
+        const jsonValue = JSON.stringify(todos);
+        await AsyncStorage.setItem("TodoApp", jsonValue);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    storeData();
+  }, [todos]);
 
   const [loaded, error] = useFonts({ Inter_500Medium });
   if (!loaded && !error) return null;
@@ -100,7 +137,6 @@ export default function Index() {
 }
 
 function createStyles(theme: Theme, colorScheme: ColorSchemeName) {
-  console.log("creating styles for", colorScheme);
   return StyleSheet.create({
     container: {
       flex: 1,
