@@ -4,6 +4,7 @@ import {
   ColorSchemeName,
   FlatList,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -15,15 +16,20 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { data } from "@/data/todos";
 import { useState } from "react";
 import Todo from "@/components/Todo";
-import { ThemeContext } from "@react-navigation/native";
+import { Inter_500Medium, useFonts } from "@expo-google-fonts/inter";
+import { useTheme } from "@/context/ThemeContext";
+import Octicons from "@expo/vector-icons/Octicons";
 
 export default function Index() {
   const [newTodo, setNewTodo] = useState("");
   const [todos, setTodos] = useState(data.sort((a, b) => b.id - a.id));
+  const { colorScheme, setColorScheme, theme } = useTheme();
   const Container = Platform.OS === "web" ? ScrollView : SafeAreaView;
-  const colorScheme = Appearance.getColorScheme();
-  const theme = colorScheme === "dark" ? colors.dark : colors.light;
+
   const styles = createStyles(theme, colorScheme);
+
+  const [loaded, error] = useFonts({ Inter_500Medium });
+  if (!loaded && !error) return null;
 
   const deleteTodo = (id: number) => {
     setTodos(todos.filter((todo) => todo.id !== id));
@@ -52,24 +58,27 @@ export default function Index() {
   };
 
   return (
-    // <View
-    //   style={{
-    //     flex: 1,
-    //     flexDirection: "column",
-    //     justifyContent: "center",
-    //     alignItems: "center",
-    //   }}
-    // >
     <Container style={styles.container}>
       <View style={styles.inputContainer}>
         <TextInput
           placeholder="Add todo..."
-          placeholderTextColor="#333"
+          placeholderTextColor="gray"
           style={styles.textInput}
           value={newTodo}
           onChangeText={(val) => setNewTodo(val)}
           onSubmitEditing={addTodo}
         />
+        <Pressable
+          onPress={() =>
+            setColorScheme(colorScheme === "light" ? "dark" : "light")
+          }
+        >
+          <Octicons
+            name={colorScheme === "dark" ? "moon" : "sun"}
+            size={24}
+            color={theme.text}
+          />
+        </Pressable>
       </View>
       <FlatList
         data={todos}
@@ -77,36 +86,47 @@ export default function Index() {
         renderItem={({ item }) => (
           <Todo todo={item} deleteTodo={deleteTodo} toggleTodo={toggleTodo} />
         )}
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
       />
     </Container>
-    // </View>
   );
 }
 
 function createStyles(theme: Theme, colorScheme: ColorSchemeName) {
+  console.log("creating styles for", colorScheme);
   return StyleSheet.create({
     container: {
       flex: 1,
       flexDirection: "column",
-      justifyContent: "center",
-      alignItems: "center",
       width: "100%",
-      marginVertical: 30,
+      paddingVertical: 30,
+      textAlign: "center",
+      backgroundColor: theme.background,
+      color: theme.text,
     },
     inputContainer: {
-      width: "100%",
+      width: "50%",
       maxWidth: 1024,
-      minWidth: 0,
+      marginHorizontal: "auto",
+      flexDirection: "row",
+      alignItems: "center",
     },
     textInput: {
       borderWidth: 1,
+      borderColor: theme.text,
       padding: 6,
       height: 40,
       marginBottom: 20,
       borderRadius: 5,
       fontSize: 18,
       marginHorizontal: 10,
+      fontFamily: "Inter_500Medium",
+      width: "100%",
+      color: theme.text,
     },
   });
 }

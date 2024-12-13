@@ -6,13 +6,13 @@ export type Theme = {
 
 export const colors = {
   light: {
-    text: "#fff",
+    text: "rgb(51,51,51)",
     background: "whitesmoke",
     headerBackground: "white",
   },
   dark: {
     text: "whitesmoke",
-    background: "#333",
+    background: "rgb(51,51,51)",
     headerBackground: "black",
   },
 };
