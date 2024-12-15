@@ -13,25 +13,9 @@ export default function RootLayout() {
   return (
     <ThemeProvider>
       <SafeAreaProvider>
-        <Stack
-          screenOptions={{
-            headerStyle: {
-              backgroundColor: colorScheme === "dark" ? "black" : "white",
-            },
-            headerTintColor: colorScheme === "dark" ? "white" : "black",
-            headerShadowVisible: false,
-            headerTitleAlign: "center",
-          }}
-        >
-          <Stack.Screen
-            name="index"
-            options={{
-              headerShown: false,
-              // statusBarHidden: true,
-              title: "Todos",
-              headerTitle: "Your todos",
-            }}
-          />
+        <Stack screenOptions={{ headerShown: false, statusBarHidden: true }}>
+          <Stack.Screen name="index" />
+          <Stack.Screen name="todos/[id]" />
         </Stack>
       </SafeAreaProvider>
     </ThemeProvider>

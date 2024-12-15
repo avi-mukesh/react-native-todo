@@ -10,13 +10,11 @@ import React, { useEffect, useState } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useTheme } from "@/context/ThemeContext";
 import { Theme } from "@/constants/colors";
+import { useRouter } from "expo-router";
+import { TodoType } from "@/data/todos";
 
 type PropsType = {
-  todo: {
-    id: number;
-    title: string;
-    completed: boolean;
-  };
+  todo: TodoType;
   deleteTodo: (id: number) => void;
   toggleTodo: (id: number) => void;
 };
@@ -24,24 +22,31 @@ type PropsType = {
 const Todo = ({ todo, deleteTodo, toggleTodo }: PropsType) => {
   const { theme, colorScheme } = useTheme();
   let styles = createStyles(theme, colorScheme);
+  const router = useRouter();
+  const handlePress = (id: number) => {
+    router.navigate(`./todos/${id.toString()}`);
+  };
+  const toggle = () => toggleTodo(todo.id);
 
   return (
     <View style={styles.todoRow}>
       <View style={styles.todoTextContainer}>
-        <Text
-          style={[
-            {
-              textDecorationLine: todo.completed ? "line-through" : "none",
-              color: todo.completed ? "gray" : "black",
-            },
-            styles.todoText,
-          ]}
-        >
-          {todo.title}
-        </Text>
+        <Pressable onLongPress={toggle} onPress={() => handlePress(todo.id)}>
+          <Text
+            style={[
+              {
+                textDecorationLine: todo.completed ? "line-through" : "none",
+                color: todo.completed ? "gray" : "black",
+              },
+              styles.todoText,
+            ]}
+          >
+            {todo.title}
+          </Text>
+        </Pressable>
       </View>
       <View style={styles.buttonContainer}>
-        <Pressable onPress={() => toggleTodo(todo.id)}>
+        <Pressable onPress={toggle}>
           <MaterialCommunityIcons
             name={todo.completed ? "check-circle" : "check-circle-outline"}
             size={28}

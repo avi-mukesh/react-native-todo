@@ -1,3 +1,4 @@
+import React from "react";
 import { colors, Theme } from "@/constants/colors";
 import {
   Appearance,
@@ -22,38 +23,38 @@ import Octicons from "@expo/vector-icons/Octicons";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StatusBar } from "expo-status-bar";
-
-type Todo = {
-  id: number;
-  title: string;
-  completed: boolean;
-};
+import { TodoType } from "@/data/todos";
+import { useFocusEffect } from "expo-router";
 
 export default function Index() {
   const [newTodo, setNewTodo] = useState("");
-  const [todos, setTodos] = useState<Todo[]>([]);
+  const [todos, setTodos] = useState<TodoType[]>([]);
   const { colorScheme, setColorScheme, theme } = useTheme();
-  const Container = Platform.OS === "web" ? ScrollView : SafeAreaView;
-
   const styles = createStyles(theme, colorScheme);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const json = await AsyncStorage.getItem("TodoApp");
-        const storageTodos = json !== null ? JSON.parse(json) : null;
+  const Container = Platform.OS === "web" ? ScrollView : SafeAreaView;
 
-        if (storageTodos && storageTodos.length > 0) {
-          setTodos(storageTodos.sort((a: Todo, b: Todo) => b.id - a.id));
-        } else {
-          setTodos(data.sort((a, b) => b.id - a.id));
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchData = async () => {
+        try {
+          const json = await AsyncStorage.getItem("TodoApp");
+          const storageTodos = json !== null ? JSON.parse(json) : null;
+
+          if (storageTodos && storageTodos.length > 0) {
+            setTodos(
+              storageTodos.sort((a: TodoType, b: TodoType) => b.id - a.id)
+            );
+          } else {
+            setTodos(data.sort((a, b) => b.id - a.id));
+          }
+        } catch (e) {
+          console.error(e);
         }
-      } catch (e) {
-        console.error(e);
-      }
-    };
-    fetchData();
-  }, []);
+      };
+      fetchData();
+    }, [data])
+  );
 
   useEffect(() => {
     const storeData = async () => {
@@ -98,7 +99,6 @@ export default function Index() {
 
   return (
     <Container style={styles.container}>
-      <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
       <View style={styles.inputContainer}>
         <TextInput
           placeholder="Add todo..."
@@ -134,6 +134,7 @@ export default function Index() {
         itemLayoutAnimation={LinearTransition}
         keyboardDismissMode="on-drag" // when we swipe up to scroll, it dismisses the keyboard
       />
+      {/* <StatusBar style={colorScheme === "dark" ? "light" : "dark"} /> */}
     </Container>
   );
 }
